@@ -14,31 +14,31 @@ import com.lamaryw.util.StdDraw;
 
 
 public class GraphDrawer {
-	
+
 	private Map<Integer, Point> points = new HashMap<Integer, Point>();
 	private double xScale = 2.1;
 	private double yScale = 2.1;
 	private double offSet = 0.1;
-	
+
 	public double getxScale() {
 		return xScale;
 	}
-	
+
 	public double getyScale() {
 		return yScale;
 	}
-	
+
 	public double getOffSet() {
 		return offSet;
 	}
-	
+
 	/**
 	 * Create a GraphDrawer for a Graph G
 	 * @param G
 	 */
 	public GraphDrawer(Graph G) {
 		int n = G.V();
-		
+
 		double step = (2 * PI) / n;//divide a circle's degree 360 to n parts, then use this degree info to create points
 		double x = 0;
 
@@ -49,54 +49,61 @@ public class GraphDrawer {
 			x += step;
 		}
 	}
-	
+
 	/**
 	 * Draw the Graph G
 	 * @param G
 	 */
 	public  void drawGraph(Graph G) {
 		// set the scale of the coordinate system
-		
+
         StdDraw.setXscale(-xScale, xScale);
         StdDraw.setYscale(-yScale, yScale);
-        
+
         StdDraw.setPenColor(Color.RED);
         StdDraw.setPenRadius(0.01);
-        
+
         int n = points.size();
-		
+
 		for (int i = 0; i < n; i++) {
 			StdDraw.point(points.get(i).getX(), points.get(i).getY());//point ID is i
 		}
-		
+
 		StdDraw.setPenColor();
         StdDraw.setPenRadius(0.001);
 		for(Integer v : G.getNodes()) {
 			for(Integer w : G.getNodes()) {
 				if(G.hasEdge(v, w)) {
-					StdDraw.line(points.get(v).getX(), points.get(v).getY(), 
+					StdDraw.line(points.get(v).getX(), points.get(v).getY(),
 							points.get(w).getX(), points.get(w).getY());
 				}
 			}
 		}
-		
+
 		StdDraw.show();
 	}
-	
+
 	public void drawText(int n, int k, double p, double avgPathLen, double clusterCoeff, double nAPL, double nCC) {
-		DecimalFormat df = new DecimalFormat("0.00");
-		
+
 		StdDraw.textLeft(xScale / 6, yScale - 0.05, "n = " + n + "   k = " + k);
-		StdDraw.textLeft(xScale / 6, yScale - 0.4, "p = " + df.format(p));
-		StdDraw.textLeft(xScale / 6, yScale - 0.6, "clusterCoeff = " + df.format(clusterCoeff));
-		StdDraw.textLeft(xScale / 6, yScale - 0.8, "avgPathLen = " + df.format(avgPathLen));
-		
-		 
-		StdDraw.textLeft(-xScale , -yScale + 1.2, "normalized CC = " + df.format(nCC));
-		StdDraw.textLeft(-xScale , -yScale + 1.0, "normalized APL = " + df.format(nAPL));
-		
+		StdDraw.textLeft(xScale / 6, yScale - 0.4, "p = " + formatMetric(p));
+		StdDraw.textLeft(xScale / 6, yScale - 0.6, "clusterCoeff = " + formatMetric(clusterCoeff));
+		StdDraw.textLeft(xScale / 6, yScale - 0.8, "avgPathLen = " + formatMetric(avgPathLen));
+
+
+		StdDraw.textLeft(-xScale , -yScale + 1.2, "normalized CC = " + formatMetric(nCC));
+		StdDraw.textLeft(-xScale , -yScale + 1.0, "normalized APL = " + formatMetric(nAPL));
+
 	}
-	
+
+	static String formatMetric(double value) {
+		return Double.isFinite(value) ? new DecimalFormat("0.00").format(value) : "undefined";
+	}
+
+	static boolean isPlottable(Point point) {
+		return point != null && Double.isFinite(point.getX()) && Double.isFinite(point.getY());
+	}
+
 	/**
 	 * draw Normalized Average Path Length or Plot
 	 * @param list
@@ -111,10 +118,10 @@ public class GraphDrawer {
         StdDraw.setPenRadius(0.008);
         StdDraw.text(xScale - 0.2, - offSet * 2 - 0.15, "APL");
 		for(Point p : list) {
-			StdDraw.point(p.getX(), p.getY() - (yScale - offSet));
+			if (isPlottable(p)) StdDraw.point(p.getX(), p.getY() - (yScale - offSet));
 		}
 	}
-	
+
 	/**
 	 * draw Normalized Clustering Coefficient Plot
 	 * @param list
@@ -128,10 +135,10 @@ public class GraphDrawer {
         StdDraw.setPenRadius(0.008);
         StdDraw.text(xScale - 0.2, - offSet * 2, "CC");
 		for(Point p : list) {
-			StdDraw.point(p.getX(), p.getY() - (yScale - offSet));
+			if (isPlottable(p)) StdDraw.point(p.getX(), p.getY() - (yScale - offSet));
 		}
 	}
-	
+
 	/**
 	 * Draw axis for the Average Path Length and Clustering Coefficient plot
 	 */
@@ -149,15 +156,15 @@ public class GraphDrawer {
 		StdDraw.line(0, -(yScale - offSet), xScale, -(yScale - offSet));//plot x axis
 		StdDraw.setPenColor();
 		StdDraw.setPenRadius();
-		
+
 	}
-	
-	
+
+
 	/*
 	private class Edge {
 		private int v;
 		private int w;
-		
+
 		public Edge(int v, int w) {
 			this.v = v;
 			this.w = w;
